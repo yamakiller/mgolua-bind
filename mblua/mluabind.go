@@ -5,7 +5,18 @@ import (
 )
 
 func goclass_gc_event(L *mlua.State) int {
+	if (L.Type(1) == int(mlua.LUA_TUSERDATA)) {
+
+	}
+
 	return 0
+}
+
+func MBLuaPushGlobalsTable(L *mlua.State) {
+	L.PushValue(mlua.LUA_REGISTRYINDEX)
+	L.PushNumber(mlua.LUA_RIDX_GLOBALS)
+	L.RawGet(-2)
+	L.Remove(-2)
 }
 
 func MBLuaModuleEnd(L *mlua.State) {
@@ -24,8 +35,10 @@ func MBLuaModule(L *mlua.State, name *string, hasva int) {
 			L.RawSet(-4)
 		}
 	} else {
-		L.PushValue(mlua.LUA_RIDX_GLOBALS)
+		MBLuaPushGlobalsTable(L)
 	}
+
+	L.Pop(1)
 }
 
 func MBLuaOpen(L *mlua.State) {
@@ -33,7 +46,7 @@ func MBLuaOpen(L *mlua.State) {
 	L.PushString("mblua_opened")
 	L.RawGet(mlua.LUA_REGISTRYINDEX)
 	if !L.IsBoolean(-1) {
-		//lua_pushstring(L,"tolua_opened"); lua_pushboolean(L,1); lua_rawset(L,LUA_REGISTRYINDEX);
+
 		L.PushString("mblua_opened")
 		L.PushBoolean(true)
 		L.RawSet(mlua.LUA_REGISTRYINDEX)
